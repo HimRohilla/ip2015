@@ -1,0 +1,55 @@
+indexId | Value | parentId
+--------------------------
+100		ABC		0
+200		DEF		100
+300		GHI		100
+400		JKL		100
+500		MNO 	200
+600		PQR		200
+700		STU		300
+800		VWX		300	
+900		YZA		400
+
+1. f(2,100)
+	"SELECT * FROM table WHERE parent_id=100";
+	--> 200,300,400
+	1.1 200
+		[
+			"200" => [
+						"value" => "DEF",
+						"nextLevel" => f(1,200)
+					]
+		]
+		f(1,200);
+		"SELECT * table WHERE parent_id=200";
+		--> 500,600
+			[
+				"500" => [
+							"value" => "MNO",
+							"nextLevel" => f(0,500)
+					     ],
+				"600" => [ 
+							"value" => "PQR",
+							"nextLevel" => f(0,600)
+						 ]
+			]
+			-> [
+					"200" => [
+								"value" => "DEF",
+								"nextLevel" => [
+												"500" => [
+															"value" => "MNO",
+															"nextLevel" => f(0,500) (NULL)
+														 ],
+												"600" => [ 
+															"value" => "PQR",
+															"nextLevel" => f(0,600) (NULL)
+														 ]	
+								               ]
+								
+							 ],
+					"300" => [...]
+			   ]
+			
+		
+		

@@ -1,0 +1,35 @@
+
+RewriteEngine On
+
+RewriteBase /ip2015
+
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+
+#System URL Rewrites
+
+RewriteRule /classes/^(.+)$ errors/404.php [R=404]
+
+RewriteRule /errors/^(.+)$ errors/404.php [R=404]
+
+RewriteRule /includes/^(.+)$ errors/404.php [R=404]
+
+RewriteRule /init/^(.+)$ errors/404.php [R=404]
+
+RewriteRule /filters/^(.+)$ errors/404.php [R=404]
+
+RewriteRule /public/^(.+)$ errors/404.php [R=404]
+
+RewriteRule /private/^(.+)$ errors/404.php [R=404]
+
+RewriteRule ^(.+)$ index.php?url=$1 [QSA]
+
+# Error Documents
+
+ErrorDocument 404 /errors/404.php
+
+ErrorDocument 403 /errors/403.php
+
+
+
+

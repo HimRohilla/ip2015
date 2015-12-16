@@ -1,0 +1,27 @@
+{
+    "Login" : "login.php",
+    
+    "User Menu" : "menu.php",
+    
+    "Time Table Menu" : "timeTable/index.php",
+    
+    "Class Time Table" : "timeTable/content.php",
+    
+    "View Student Attendance" : "student/viewStudentAttendance.php",
+    
+    "View Student Internal Marks" : "student/viewStudentInternalMarks.php",
+    
+    "View Class Attendance" : "teacher/viewClassAttendance.php",
+    
+    "View Class Internal Marks" : "teacher/viewClassInternalMarks.php",
+    
+    "Edit Class Attendance" : "teacher/editClassAttendance.php",
+    
+    "Edit Class Internal Marks" : "teacher/editClassInternalMarks.php",
+    
+    "Feedback Form" : "feedbackForm.php",
+    
+    "Feedback Form Handler" : "formHandlers/feedbackFormHandler.php",
+    
+    "Phone Number Handler" : "formHandlers/phoneNumberHandler.php"
+}

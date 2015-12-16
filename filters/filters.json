@@ -1,0 +1,12 @@
+[
+    {
+        "filter-name" : "Feedback Submission Filter",
+        "filter-file" : "feedbackSubmissionFilter.php",
+        "deciding-handler" : "Feedback Form Handler"
+    },
+    {
+        "filter-name" : "Phone Number Filter",
+        "filter-file" : "phoneNumberFilter.php",
+        "deciding-handler" : "Phone Number Handler"
+    }
+]

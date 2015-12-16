@@ -1,0 +1,45 @@
+usertypes -->
+PRIMARY USER TYPES
+----------------------------------
+1. student
+2. permanent faculty
+3. temporary faculty
+4. ad-hoc faculty
+5. non-teaching staff
+
+SECONDARY USER TYPES
+----------------------------------
+6. super admin
+7. society admin
+8. academics admin
+9. society in-charge
+10. feedback admin
+11. alumni
+
+primary_usertypes_grants(1)
+-------------------------------
+primary_usertype_id permission_id
+1 					2
+1 					3
+
+secondary_usertypes_grants(2)
+-----------------------------------
+secondary_usertype_id permission_id
+6						1-36
+
+assigned_permissions
+-----------------------------------
+uid 	usertype_id		assigned_by 	created_date	modified_date		is_deleted
+7422 	1				100					00000 			 ----				00000
+2698	2				100					0000000			-------				0000000
+2698	9				100					000000			------				00000
+
+
+revoked_user_permissions(3)
+-----------------------------------
+uid 	permission_id	revoked_by		created_date	modified_date	is_deleted
+
+
+Assigned Permissions -->
+(1 U 2) - 3
+
