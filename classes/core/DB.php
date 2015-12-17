@@ -12,7 +12,7 @@ class DB {
     private function __construct(){
         $this->_pdo = new PDO("mysql:host={$GLOBALS["CONFIG"]["DB"]["hostname"]};dbname={$GLOBALS["CONFIG"]["DB"]["dbname"]}",$GLOBALS["CONFIG"]["DB"]["username"],$GLOBALS["CONFIG"]["DB"]["password"],array(
              PDO::ATTR_PERSISTENT => true,
-             PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING
+             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
         ));   
     }
     
