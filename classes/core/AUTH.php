@@ -3,32 +3,31 @@
 class AUTH {
   
     public static function login($username = "",$password = "",$usernameType = "email"){
-       if(!$username || !$password){
-           throw new CustomException("Credentials not provided");
+       if(is_string($username) && is_string($password) && is_string($usernameType)){
+            $db = DB::getInstance();
+            if($db->select("user",array($usernameType => $username,"is_deleted" => 0),array("UID","name","password"))->count()){
+                $result = $db->results();
+                $passwordHash = $result[0]["password"];
+                $userId = $result[0]["UID"];
+                $name = $result[0]["name"];
+                if(HASH::verifyPassword($password,$passwordHash)){
+                    $user = new User($userId);
+                    $userSet = array(
+                        "user-id" => $userId,
+                        "name" => $name,
+                        "permissions" => $user->getPermissionList()
+                    );
+                    if(SESSION::exists("user")){
+                        SESSION::deleteSession("user");
+                    }
+                    SESSION::setSession("user",$userSet);
+                    return true;
+                }
+            }
+            return false;
        }
        else{
-           $db = DB::getInstance();
-           echo $username." : ".$password."<br>";
-           if($db->select("user",array($usernameType => $username,"is_deleted" => 0),array("UID","name","password"))->count()){
-               $result = $db->results();
-               $passwordHash = $result[0]["password"];
-               $userId = $result[0]["UID"];
-               $name = $result[0]["name"];
-               if(HASH::verifyPassword($password,$passwordHash)){
-                   $user = new User($userId);
-                   $userSet = array(
-                       "user-id" => $userId,
-                       "name" => $name,
-                       "permissions" => $user->getPermissionList()
-                   );
-                   if(SESSION::exists("user")){
-                       SESSION::deleteSession("user");
-                   }
-                   SESSION::setSession("user",$userSet);
-                   return true;
-               }
-           }
-           return false;
+           throw new CustomException("Either of the credential parameter is not string type");
        }
     }
     
