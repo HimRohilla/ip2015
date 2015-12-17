@@ -16,7 +16,7 @@ class Input{
     public static function get($item){
         if(isset($_POST[$item])){
             if(is_array($_POST[$item])){
-                for($i=0; $i<count($_POST[$item]); $++){
+                for($i=0; $i<count($_POST[$item]); $i++){
                     $_POST[$item][i] = self::sanitizeInput($_POST[$item][i]); 
                 }
                 return $_POST[$item];
@@ -26,7 +26,7 @@ class Input{
         }
         else if(isset($_GET[$item])){
             if(is_array($_GET[$item])){
-                for($i=0; $i<count($_GET[$item]); $++){
+                for($i=0; $i<count($_GET[$item]); $i++){
                     $_GET[$item][i] = self::sanitizeInput($_GET[$item][i]); 
                 }
                 return $_GET[$item];
