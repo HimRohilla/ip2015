@@ -1,7 +1,6 @@
 <?php
 
 class DB {
-   
     private static $_instance = null;
     		
     private $_pdo = null,
@@ -13,8 +12,8 @@ class DB {
     private function __construct(){
         $this->_pdo = new PDO("mysql:host={$GLOBALS["CONFIG"]["DB"]["hostname"]};dbname={$GLOBALS["CONFIG"]["DB"]["dbname"]}",$GLOBALS["CONFIG"]["DB"]["username"],$GLOBALS["CONFIG"]["DB"]["password"],array(
              PDO::ATTR_PERSISTENT => true,
-             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-          ));   
+             PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING
+        ));   
     }
     
     public static function getInstance(){
@@ -25,25 +24,41 @@ class DB {
     }
     
     public function executeQuery($queryParameters = array(),$sql = ""){
-        if($sql == ""){
+        if(!is_string($sql)){
+            throw new CustomException("SQL query is not a string");
+        }
+        if($this->_sql == "" && $sql == ""){
+            throw new CustomException("No SQL string is provided");
+        }
+        else if($sql == "" && $this->_sql != ""){
             $sql = $this->_sql;
         }
-        $this->_query = $this->_pdo->prepare($sql);
-        $x = 1;
-        if(count($queryParameters)){
-            foreach($queryParameters as $param){
-                if($param == null){
-                   $this->_query->bindValue($x, PDO::PARAM_NULL); 
-                }
-                else{
-                   $this->_query->bindValue($x, $param);
-                }
-                $x++;
+        else if(!is_array($queryParameters)){
+            throw new CustomException("Value set for the query is not an array");
+        }
+        else{
+            try
+            {
+                $this->_query = $this->_pdo->prepare($sql);
+                $x = 1;
+                if(count($queryParameters)){
+                    foreach($queryParameters as $param){
+                        if($param == null){
+                           $this->_query->bindValue($x, PDO::PARAM_NULL); 
+                        }
+                        else{
+                           $this->_query->bindValue($x, $param);
+                        }
+                        $x++;
+                    }
+                } 
+                $this->_query->execute();
+                $this->_count = $this->_query->rowCount();
+                return $this;
+            } catch (PDOException $ex) {
+                throw new CustomException($ex->getMessage());
             }
-        } 
-        $this->_query->execute();
-        $this->_count = $this->_query->rowCount();
-        return $this;
+        }
     }
     
     /*
@@ -57,8 +72,14 @@ class DB {
      */
     
     public function batchInsert($sql = "",$paramSet = array(),$isTransaction = true){
-        if($sql == ""){
-            throw new CustomException("SQL query string not found");
+        if(is_string($sql) || $sql == ""){
+            throw new CustomException("SQL query is not a string");
+        }
+        else if(!is_array($paramSet)){
+            throw new CustomException("Value set for the query is not an array");
+        }
+        else if(!is_bool($isTransaction)){
+            throw new CustomException("'isTransaction' flag parameter is not a boolean");
         }
         else{
             if($isTransaction){
@@ -118,8 +139,14 @@ class DB {
     }
     
     public function update($table = "",$updateParams = array(),$whereParams = array()){
-        if($table == ""){
-            throw new CustomException("Table name not provided");
+        if(!is_string($table) || $table == ""){
+            throw new CustomException("Table name is not a string or an empty string");
+        }
+        else if(!is_array($whereParams)){
+            throw new CustomException("'WHERE' clause parameter set is not an array");
+        }
+        else if(!is_array($updateParams)){
+            throw new CustomException("Column set to be updated is not an array");
         }
         else if(!count($updateParams)){
             throw new CustomException("Values to be updated not provided");
@@ -158,33 +185,45 @@ class DB {
     }
     
     public function delete($table,$whereParams = array()){
-           if($table == ""){
-               throw new CustomException("Table name not provided");
-           }
-           else{
-               $querySet = array();
-               if(count($whereParams)){
-                    $whereParamCount = count($whereParams);
-                    $x = 1;
-                    foreach($whereParams as $whereParamName => $whereParamValue){
-                      $values = '';
-                      $values .= "`$whereParamName` = ?";
-                      $querySet[] = $whereParamValue; 
-                      if($x < $whereParamCount){
-                          $values .= ', '; 
-                      }
-                      $x++;
-                    }
-                    $this->_sql = "DELETE FROM `$table` WHERE $values";
-               }
-               $this->executeQuery($querySet);
-               return $this;
-           }
+        if(!is_string($table) || $table == ""){
+            throw new CustomException("Table name is not a string or an empty string");
+        }
+        else if(!is_array($whereParams)){
+            throw new CustomException("'WHERE' clause parameter set is not an array");
+        }
+        else{
+            $querySet = array();
+            if(count($whereParams)){
+                 $whereParamCount = count($whereParams);
+                 $x = 1;
+                 foreach($whereParams as $whereParamName => $whereParamValue){
+                   $values = '';
+                   $values .= "`$whereParamName` = ?";
+                   $querySet[] = $whereParamValue; 
+                   if($x < $whereParamCount){
+                       $values .= ', '; 
+                   }
+                   $x++;
+                 }
+                 $this->_sql = "DELETE FROM `$table` WHERE $values";
+            }
+            $this->executeQuery($querySet);
+            return $this;
+        }
     }
     
     public function select($table = "",$whereParams = array(),$selectParams = array(),$extras = ""){
-        if($table == ""){
-            throw new CustomException("Table name not provided");
+        if(!is_string($table) || $table == ""){
+            throw new CustomException("Table name is not a string or an empty string");
+        }
+        else if(!is_array($whereParams)){
+            throw new CustomException("'WHERE' clause parameter set is not an array");
+        }
+        else if(!is_array($selectParams)){
+            throw new CustomException("Column names set is not an array");
+        }
+        else if(!is_string($extras)){
+            throw new CustomException("Parameter for extra query end clauses is not string");
         }
         else{
             $selectSet = (count($selectParams)) ? "`".implode('`,`',$selectParams)."`" : '*';
@@ -229,47 +268,59 @@ class DB {
      */
     
     public function traceDown($table  = "",$id = "",$level = 0,$indexIdName = "id",$parentIdName = "parent_id",$valueIdName = "name",$array = array()){
-            if($table == ""){
-                throw new CustomException("Table name not provided");
-            }
-            else if(!$level){
-                throw new CustomException("Recursion level not specified");
-            }
-            else if(!is_int($level)){
-                throw new CustomException("Level of recursion should be an integer");
-            }
-            else if($id == ""){
-                throw new CustomException("Id for tracing not provided");
-            }
-            else{
-                if($this->executeQuery(array($id),"SELECT * FROM `$table` WHERE `$parentIdName` = ?")->count()){
-                    $results = $this->results();
-                    foreach($results as $result){
-                        $array[$result[$indexIdName]] = [
-                          "value" =>  $result[$valueIdName],
-                        ];
-                        $array[$result[$indexIdName]]["Level Down"] = ($level - 1 > 0) ? $this->traceDown($table,$result[$indexIdName],$level-1,$indexIdName,$parentIdName) : -1;
-                    }
-                    return $array;
-                }
-                else{
-                    return null;
-                }  
-            }
-    }
-    
-    public function traceUp($table = "",$id = "",$level = 0,$indexIdName = "id",$parentIdName = "parent_id",$valueIdName = "name",$array = array()){
-        if($table == ""){
+        if(!is_string($table) || $table == ""){
             throw new CustomException("Table name not provided");
         }
         else if(!$level){
-            throw new CustomException("Recursion level not specified");
+            throw new CustomException("Recursion level is not specified");
         }
-        else if(!is_int($level)){
-            throw new CustomException("Level of recursion should be an integer");
+        else if(!is_int($level) || $level == 0){
+            throw new CustomException("Level of recursion should be an integer and should be greater than zero");
         }
-        else if($id == ""){
-            throw new CustomException("Id for tracing not provided");
+        else if(!is_string($id) || $id == ""){
+            throw new CustomException("Id for tracing is not a string or an empty string");
+        }
+        else if(!is_string($parentIdName) || $parentIdName == ""){
+            throw new CustomException("Name of parent id column is not a string or an empty string");
+        }
+        else if(!is_string($valueIdName) || $valueIdName == ""){
+            throw new CustomException("Name of value column is not a string or an empty string");
+        }
+        else{
+            if($this->executeQuery(array($id),"SELECT * FROM `$table` WHERE `$parentIdName` = ?")->count()){
+                $results = $this->results();
+                foreach($results as $result){
+                    $array[$result[$indexIdName]] = [
+                      "value" =>  $result[$valueIdName],
+                    ];
+                    $array[$result[$indexIdName]]["Level Down"] = ($level - 1 > 0) ? $this->traceDown($table,$result[$indexIdName],$level-1,$indexIdName,$parentIdName) : -1;
+                }
+                return $array;
+            }
+            else{
+                return null;
+            }  
+        }
+    }
+    
+    public function traceUp($table = "",$id = "",$level = 0,$indexIdName = "id",$parentIdName = "parent_id",$valueIdName = "name",$array = array()){
+        if(!is_string($table) || $table == ""){
+            throw new CustomException("Table name not provided");
+        }
+        else if(!$level){
+            throw new CustomException("Recursion level is not specified");
+        }
+        else if(!is_int($level) || $level == 0){
+            throw new CustomException("Level of recursion should be an integer and should be greater than zero");
+        }
+        else if(!is_string($id) || $id == ""){
+            throw new CustomException("Id for tracing is not a string or an empty string");
+        }
+        else if(!is_string($parentIdName) || $parentIdName == ""){
+            throw new CustomException("Name of parent id column is not a string or an empty string");
+        }
+        else if(!is_string($valueIdName) || $valueIdName == ""){
+            throw new CustomException("Name of value column is not a string or an empty string");
         }
         else{
             if($this->executeQuery(array($id),"SELECT * FROM `$table` WHERE `$indexIdName` = ?")->count()){
