@@ -39,7 +39,7 @@ class Input{
             $data = json_decode(file_get_contents('php://input'), true);
             if(!empty($data)){
                 if(is_array($data[$item])){
-                    for($i=0; $i<count($data[$item]); $++){
+                    for($i=0; $i<count($data[$item]); $i++){
                         $data[$item][i] = self::sanitizeInput($data[$item][i]);
                     }
                     return $data[$item];
@@ -48,7 +48,7 @@ class Input{
                     return self::sanitizeInput($data[$item]);
             }
         }
-        return throw new CustomException("$item is not a request parameter.");
+        throw new CustomException("$item is not a request parameter.");
     }
     
     public static function isValid(){
