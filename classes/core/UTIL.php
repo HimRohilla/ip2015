@@ -1,5 +1,9 @@
 <?php
 
+namespace core;
+
+namespace v1;
+
 class UTIL {
     
     const NOT_INCLUDE = array(".","..");

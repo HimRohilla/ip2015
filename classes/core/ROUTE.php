@@ -1,5 +1,9 @@
 <?php
 
+namespace core;
+
+namespace v1;
+
 class ROUTE {
     
     private static $_status = array(

@@ -1,4 +1,9 @@
 <?php
+
+namespace core;
+
+namespace v1;
+
     class SESSION {
             private static $salt = array(9, 5, 8, 2, 4, 5, 7, 8, 1, 3);
             private static $salt_string = "";

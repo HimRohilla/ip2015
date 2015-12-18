@@ -1,5 +1,9 @@
 <?php
 
+namespace core;
+
+namespace v1; 
+
 class AUTH {
   
     public static function login($username = "",$password = "",$usernameType = "email"){

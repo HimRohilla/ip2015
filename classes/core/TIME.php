@@ -1,5 +1,9 @@
-<?php
-	
+<?php	
+
+namespace core;
+
+namespace v1;
+
 	class Time{
 		private static function isEmpty($timestamp){
 			if(!$timestamp)
