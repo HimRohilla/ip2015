@@ -81,8 +81,8 @@ class DB {
      */
     
     public function batchInsert($sql = "",$paramSet = array(),$isTransaction = true){
-        if(is_string($sql) || $sql == ""){
-            throw new CustomException("SQL query is not a string");
+        if(!is_string($sql) || $sql == ""){
+            throw new CustomException("SQL query is not a string or an empty string");
         }
         else if(!is_array($paramSet)){
             throw new CustomException("Value set for the query is not an array");
@@ -94,40 +94,50 @@ class DB {
             if($isTransaction){
                $this->_pdo->beginTransaction();
             }
-            $this->_query = $this->pdo->prepare($sql);
-            if(count($paramSet)){
-                $iterationCount = 1;
-                foreach($paramSet as $params){
-                   if(!count($params)){
-                     throw new CustomException("No Parameter set found for iteration - $iterationCount.");  
-                   }
-                   else{
-                       $x = 1;
-                       foreach($params as $paramValue){
-                          $this->_query->bindValue($x,$paramValue);
-                          $x++;
+            try{
+                $this->_query = $this->_pdo->prepare($sql);
+                if(count($paramSet)){
+                    $iterationCount = 1;
+                    foreach($paramSet as $params){
+                       if(!is_array($params) || !count($params)){
+                         throw new CustomException("No Parameter set found for iteration - $iterationCount.");  
                        }
-                       $this->_query->execute();
-                       $iterationCount++;
-                   }
+                       else{
+                           $x = 1;
+                           foreach($params as $paramValue){
+                              $this->_query->bindValue($x,$paramValue);
+                              $x++;
+                           }
+                           $this->_query->execute();
+                           $iterationCount++;
+                       }
+                    }
+                    if($isTransaction){
+                       $this->_pdo->commit();
+                       $this->_count = $this->_query->rowCount();
+                    }
                 }
+                else{
+                    throw new CustomException("No parameter set found");
+                }
+            } catch (Exception $ex) {
                 if($isTransaction){
-                   $this->_pdo->commit();
+                    $this->_pdo->rollBack();
                 }
-                return $this;
-            }
-            else{
-                throw new CustomException("No parameter set found");
+                throw new CustomException($ex->getMessage());
             }
         }
     }  
     
     public function insert($table = "",$insertParams = array()){
-        if($table == ""){
-            throw new CustomException("Table name not provided");
+        if(!is_string($table) || $table == ""){
+            throw new CustomException("Table name is not a string or an empty string");
+        }
+        else if(!is_array($insertParams)){
+            throw new CustomException("Insert parameter set is not an array");
         }
         else if(!count($insertParams)){
-            throw new CustomException("Values to be inserted not provided");
+            throw new CustomException("Insert parameter set is an empty array");
         }
         else{
             $insertParamCount = count($insertParams);
