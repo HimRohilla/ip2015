@@ -104,11 +104,11 @@ class VALIDATE {
                             break;
                         }
                         if($rule_value == 'strict'){
-                            $SMTPValidator = new SMTP_validateEmail();
+                            $smtpValidator = new SMTP_validateEmail();
                             // turn on debugging if you want to view the SMTP transaction
-                            //$SMTP_Validator->debug = true;
-                            $results = $SMTPValidator->validate(array($email));
-                            if (!$results[$email]) {
+                            //$smtp_Validator->debug = true;
+                            $results = $smtpValidator->validate(array($value));
+                            if (!$results[$value]) {
                                 list($userName, $mailDomain) = split("@", $value);
                                 if (!checkdnsrr($mailDomain, 'ANY')) {
                                     $this->addError("$item ($value) is not a valid Email");
