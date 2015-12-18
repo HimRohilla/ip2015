@@ -10,10 +10,18 @@ class DB {
             $_count = 0;
     
     private function __construct(){
-        $this->_pdo = new PDO("mysql:host={$GLOBALS["CONFIG"]["DB"]["hostname"]};dbname={$GLOBALS["CONFIG"]["DB"]["dbname"]}",$GLOBALS["CONFIG"]["DB"]["username"],$GLOBALS["CONFIG"]["DB"]["password"],array(
-             PDO::ATTR_PERSISTENT => true,
-             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-        ));   
+        try
+        {
+            $this->_pdo = new PDO("mysql:host={$GLOBALS["CONFIG"]["DB"]["hostname"]};dbname={$GLOBALS["CONFIG"]["DB"]["dbname"]}",$GLOBALS["CONFIG"]["DB"]["username"],$GLOBALS["CONFIG"]["DB"]["password"],array(
+                PDO::ATTR_PERSISTENT => true,
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ));
+        } catch (PDOException $ex) {
+            throw new CustomException($ex->getMessage());
+        }
+        catch(Exception $ex){
+            throw new CustomException($ex->getMessage());
+        }
     }
     
     public static function getInstance(){
@@ -30,34 +38,35 @@ class DB {
         if($this->_sql == "" && $sql == ""){
             throw new CustomException("No SQL string is provided");
         }
-        else if($sql == "" && $this->_sql != ""){
+        if($sql == "" && $this->_sql != ""){
             $sql = $this->_sql;
         }
-        else if(!is_array($queryParameters)){
+        if(!is_array($queryParameters)){
             throw new CustomException("Value set for the query is not an array");
         }
-        else{
-            try
-            {
-                $this->_query = $this->_pdo->prepare($sql);
-                $x = 1;
-                if(count($queryParameters)){
-                    foreach($queryParameters as $param){
-                        if($param == null){
-                           $this->_query->bindValue($x, PDO::PARAM_NULL); 
-                        }
-                        else{
-                           $this->_query->bindValue($x, $param);
-                        }
-                        $x++;
+        try
+        {
+            $this->_query = $this->_pdo->prepare($sql);
+            $x = 1;
+            if(count($queryParameters)){
+                foreach($queryParameters as $param){
+                    if($param == null){
+                       $this->_query->bindValue($x, PDO::PARAM_NULL); 
                     }
-                } 
-                $this->_query->execute();
-                $this->_count = $this->_query->rowCount();
-                return $this;
-            } catch (PDOException $ex) {
-                throw new CustomException($ex->getMessage());
-            }
+                    else{
+                       $this->_query->bindValue($x, $param);
+                    }
+                    $x++;
+                }
+            } 
+            $this->_query->execute();
+            $this->_count = $this->_query->rowCount();
+            return $this;
+        } catch (PDOException $ex) {
+            throw new CustomException($ex->getMessage());
+        }
+        catch(Exception $e){
+            throw new CustomException($e->getMessage());
         }
     }
     
