@@ -1,9 +1,5 @@
 <?php
 
-namespace core;
-
-namespace v1;
-
 require_once 'includes/UUID.php';
 
 class HASH {

@@ -1,9 +1,5 @@
 <?php
 
-namespace core;
-
-namespace v1;
-
 class USER {
     
     protected $_db = null;

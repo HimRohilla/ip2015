@@ -1,9 +1,5 @@
 <?php
 
-namespace core;
-
-namespace v1;
-
 class VALIDATE {
     private $_passed = false,
             $_errors = array(),

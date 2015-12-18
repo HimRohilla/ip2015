@@ -1,15 +1,14 @@
 <?php
-namespace core;
-
-namespace v1;
 
 class CustomException extends Exception {
+    
         public function errorMessage() {
                 //error message
                 $errorMsg = '<b>Error: </b>on line <b>'.$this->getLine().'</b> in file '.$this->getFile()
                 .' : <b>'.$this->getMessage().'</b><br>';
                 return $errorMsg;
         }
+        
         public function printStackTrace(){
                 $traceArray = $this->getTrace();
                 $printMsg = '<b>Error:</b> '.$this->getMessage().'<br>';

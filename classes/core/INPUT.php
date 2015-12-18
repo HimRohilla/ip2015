@@ -1,7 +1,4 @@
 <?php 
-namespace core;
-
-namespace v1;
 
 class INPUT{
     public static function exists($type = 'post'){

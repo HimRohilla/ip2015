@@ -1,9 +1,5 @@
 <?php
 
-namespace core;
-
-namespace v1;
-
 class DB {
     private static $_instance = null;
     		
