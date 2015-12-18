@@ -1,5 +1,6 @@
 <?php 
-class Input{
+
+class INPUT{
     public static function exists($type = 'post'){
         switch($type){
             case 'post' : 
