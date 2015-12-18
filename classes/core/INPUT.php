@@ -36,9 +36,19 @@ class Input{
         }
         
         else {
-            $data = json_decode(file_get_contents('php://input'), true);
-            if(!empty($data)){
-                if(is_array($data[$item])){
+            $data = null;
+            if(!SESSION::exists('JSONInputData')){
+                $temp = json_decode(file_get_contents('php://input'), true);
+                if(!empty($temp)){
+                    SESSION::setSession('JSONInputData',$temp);
+                    $data = $temp;
+                }
+            }
+            else{
+                $data = SESSION::getSession('JSONInputData');
+            }
+            if($data){                                   
+                if(is_array($data)){
                     for($i=0; $i<count($data[$item]); $i++){
                         $data[$item][i] = self::sanitizeInput($data[$item][i]);
                     }
