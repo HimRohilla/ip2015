@@ -37,9 +37,19 @@ class INPUT{
         }
         
         else {
-            $data = json_decode(file_get_contents('php://input'), true);
-            if(!empty($data)){
-                if(is_array($data[$item])){
+            $data = null;
+            if(!SESSION::exists('JSONInputData')){
+                $temp = json_decode(file_get_contents('php://input'), true);
+                if(!empty($temp)){
+                    SESSION::setSession('JSONInputData',$temp);
+                    $data = $temp;
+                }
+            }
+            else{
+                $data = SESSION::getSession('JSONInputData');
+            }
+            if($data){                                   
+                if(is_array($data)){
                     for($i=0; $i<count($data[$item]); $i++){
                         $data[$item][i] = self::sanitizeInput($data[$item][i]);
                     }
@@ -52,12 +62,29 @@ class INPUT{
         throw new CustomException("$item is not a request parameter.");
     }
     
-    public static function isValid(){
-        if(self::exists('csrf_token') && Session::exists('csrf_token')){    //or access token_name from config file.
-            if(Input::get('csrf_token') == Session::get('csrf_token'))
-                return true;
+    public static function getToken($tokenKey = "csrf_token"){
+        if(!is_string($tokenKey) || $tokenKey == ""){
+            throw new CustomException("CSRF token key provided is not string or an empty string");
         }
-        return false;
+        else{
+            if(!SESSION::exists($tokenKey)){
+                SESSION::setSession($tokenKey, HASH::generateRandomString(20));
+            }
+            return SESSION::getSession($tokenKey);
+        }
+    }
+    
+    public static function isValidRequest($tokenKey = "csrf_token"){
+        if(!is_string($tokenKey) || $tokenKey == ""){
+            throw new CustomException("CSRF token key provided is not string or an empty string");
+        }
+        else{
+            if(self::get($tokenKey) && Session::exists($tokenKey)){    //or access token_name from config file.
+                if(self::get($tokenKey) == Session::getSession($tokenKey))
+                    return true;
+            }
+            return false;
+        }
     }
     
     private static function sanitizeInput($input){
