@@ -1,6 +1,6 @@
 <?php
 
-require_once 'includes/UUID.php';
+require_once __DIR__.'/../../includes/UUID.php';
 
 class HASH {
     
@@ -66,7 +66,6 @@ class HASH {
             throw new CustomException("Provide a valid a string type for the random string generation.");
         }
         else{
-            echo "Length is $length";
             $characters = $stringType['characters'];
             $charactersLength = strlen($characters);
             $randomString = '';
