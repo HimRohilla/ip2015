@@ -1,1 +1,4 @@
-home.php in root 
+<?php 
+{
+    
+}

@@ -4,13 +4,9 @@ class UTIL {
     
     const NOT_INCLUDE = array(".","..");
     
-    public static function getFilesInDirectory($directory){
-        $directory = strval($directory);
-        if(!$directory){
-            throw new Exception("Please provide a valid directory name");
-        }
-        else if(!is_dir($directory)){
-            throw new Exception("No such directory exists");
+    public static function getFilesInDirectory($directory = ""){
+        if(!is_string($directory) || $directory == ""){
+            throw new CustomException("Directory name is not string or an empty string");
         }
         else{
             $list = scandir($directory);
@@ -18,15 +14,13 @@ class UTIL {
         }
     }
     
-    public static function recursive_file_exists($filename, $directory)
+    public static function recursiveFileExists($filename = "", $directory = "")
     {
-        $filename = strval($filename);
-        $directory = strval($directory);
-        if(!$filename){
-            throw new Exception("File Name not provided");
+        if(!is_string($filename) || $filename == ""){
+            throw new CustomException("File name is not string or an empty string");
         }
-        else if(!$directory){
-            throw new Exception("Directory Name not provided");
+        else if(!is_string($directory) || $directory == ""){
+            throw new CustomException("Directory name is not string or an empty string");
         }
         else{
             try
@@ -53,17 +47,24 @@ class UTIL {
         }
     }
     
-    public static function array_flatten($array,$return) {
-	foreach($array as $itemIndex => $itemValue) {
-		if(is_array($array[$itemIndex])) {
-			$return = self::array_flatten($array[$itemIndex], $return);
-		}
-		else {
-			if(isset($array[$itemIndex])) {
-				$return[] = $array[$itemIndex];
-			}
-		}
-	}
-	return $return;
+    public static function array_flatten($array,$return = array()) 
+    {
+        if(!is_array($array) || $array == array()){
+            throw new CustomException("Array parameter to be flattened is not an array or an empty array");
+        }
+        else if(!is_array($return)){
+            throw new CustomException("Recursive array parameter is not array");
+        }
+        foreach($array as $itemIndex => $itemValue) {
+            if(is_array($array[$itemIndex])) {
+                    $return = self::array_flatten($array[$itemIndex], $return);
+            }
+            else {
+                    if(isset($array[$itemIndex])) {
+                            $return[] = $array[$itemIndex];
+                    }
+            }
+        }
+        return $return;
     }
 }

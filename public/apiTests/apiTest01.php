@@ -86,10 +86,6 @@ for($i = 0 ; $i < 20 ; $i++){
     
     $userEntity["modified_by"] = $adminId;
     
-    echo "<pre>",print_r($userEntity),"</pre>";
-    
-    echo "<br><br>";
-    
     $db->insert("user",$userEntity);
     
     $userTypeEntity = array("user_id" => $uuid, "usertype_id" => mt_rand(1,4),"modified_by" => $adminId);

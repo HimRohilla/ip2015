@@ -81,7 +81,7 @@ class SESSION {
             }
             return $flashMessage;
         }
-
+        
         private static function encode($value){
                 $newValue = "";
                 $salt = self::$salt;

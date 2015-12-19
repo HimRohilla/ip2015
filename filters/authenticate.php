@@ -2,19 +2,29 @@
 
 try{
     if(!SESSION::exists("user")){
-        if(INPUT::get("username") && INPUT::get("password") && INPUT::get("csrf_token")){
-            if(INPUT::isValidRequest()){
-                if(AUTH::login(INPUT::get("username"),INPUT::get("password"))){
-                  $filterSet = json_decode(file_get_contents(__DIR__."/filters.json"),true);
+        if(INPUT::exists()){
+            if(INPUT::get("username") && INPUT::get("password") && INPUT::get("csrf_token")){
+                if(INPUT::isValidRequest()){
+                    if(AUTH::login(INPUT::get("username"),INPUT::get("password"))){
+                      $filterSet = json_decode(file_get_contents(__DIR__."/filters.json"),true);
+                    }
+                    else{
+                        SESSION::setFlash("error","Username or password is incorrect");
+                        header("Location:".ROUTE::getAbsoluteURL("Login"));
+                    }
                 }
                 else{
-                    SESSION::setFlash("error","Username or password is incorrect");
+                    SESSION::setFlash("error","Not valid request");
                     header("Location:".ROUTE::getAbsoluteURL("Login"));
                 }
             }
+            else{
+                SESSION::setFlash("error","No username and password provided");
+                header("Location:".ROUTE::getAbsoluteURL("Login"));
+            }
         }
         else{
-            Session::setFlash("error", "No username and password provided");
+            SESSION::setFlash("error","No input provided");
             header("Location:".ROUTE::getAbsoluteURL("Login"));
         }
     }

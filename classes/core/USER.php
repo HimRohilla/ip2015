@@ -42,13 +42,14 @@ class USER {
             }
             $userTypeSet = "(".rtrim($userTypeSet,",").")";
             if($this->_db->executeQuery($clauseSet,"SELECT permission_id FROM primary_usertype_permission WHERE usertype_id IN $userTypeSet AND permission_id NOT IN (SELECT permission_id FROM user_permission_revoked WHERE user_id=? AND is_deleted=?) AND is_deleted=? UNION SELECT permission_id FROM secondary_usertype_permission WHERE usertype_id IN  $userTypeSet AND permission_id NOT IN (SELECT permission_id FROM user_permission_revoked WHERE user_id=? AND is_deleted=?) AND is_deleted=?")->count()){
-                $results = UTIL::array_flatten($this->_db->results(),array());
+                $resultSet = $this->_db->results();
+                $results = UTIL::array_flatten($resultSet);
                 $clauseString = "(";
                 foreach($results as $item){
                     $clauseString .= "?,";
                 }
                 $clauseString = rtrim($clauseString,",").")";
-                $this->_permissions = UTIL::array_flatten($this->_db->executeQuery($results,"SELECT name FROM permission WHERE id IN $clauseString")->results(),array());
+                $this->_permissions = UTIL::array_flatten($this->_db->executeQuery($results,"SELECT name FROM permission WHERE id IN $clauseString")->results());
             }
         }
     }
