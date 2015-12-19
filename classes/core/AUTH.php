@@ -17,11 +17,16 @@ class AUTH {
                         "name" => $name,
                         "permissions" => $user->getPermissionList()
                     );
-                    if(SESSION::exists("user")){
-                        SESSION::deleteSession("user");
+                    if(in_array("Login",$userSet["permissions"])){
+                        if(SESSION::exists("user")){
+                            SESSION::deleteSession("user");
+                        }
+                        SESSION::setSession("user",$userSet);
+                        return true;
                     }
-                    SESSION::setSession("user",$userSet);
-                    return true;
+                    else{
+                        return false;
+                    }
                 }
             }
             return false;
