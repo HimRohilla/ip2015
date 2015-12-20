@@ -8,7 +8,22 @@ class USER {
     
     protected $_permissions = null;
     
-    public function __construct($userId) {
+    public function __construct(){
+        $a = func_get_args(); 
+        $i = func_num_args(); 
+        if (method_exists($this,$f='__construct'.$i)) { 
+            call_user_func_array(array($this,$f),$a); 
+        } 
+        else{
+            throw new CustomException("Constructor cannot be called with $i arguments");
+        }
+    }
+    
+    private function __construct0(){
+        $this->_db = DB::getInstance();
+    }
+  
+    private function __construct1($userId) {
         if(!$userId){
             throw new CustomException("User ID Not Found");
         }
@@ -23,8 +38,9 @@ class USER {
             }
         }
     }
+   
     
-    private function fetchUserTypePermissions(){
+    protected function fetchUserTypePermissions(){
         if($this->_db->select("user_usertype",array("user_id" => $this->_userId,"is_deleted" => 0),array("usertype_id"))->count()){
             $userTypeSet = "";
             $clauseSet = array();
