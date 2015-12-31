@@ -67,4 +67,107 @@ class UTIL {
         }
         return $return;
     }
+    public static function isDate($date){
+        if($date != ""){
+            $array = date_parse($date);
+            if(!$array['error_count'] && !$array['warning_count'])
+                return true;
+            else
+                return false;
+        }
+        throw new CustomException("Argument cannot be empty");
+    }
+    public static function getStartEndTimestamp($monthName = "", $year = ""){
+        $string = $monthName." ".$year;
+        if(self::isDate($string)) {
+            $numberOfDays = date("t", strtotime($string));
+            $array['startTimestamp'] = strtotime($string);
+            $array['endTimestamp'] = strtotime($numberOfDays + " " + $string);
+            return $array;
+        }
+        throw new CustomException("Arguments cannot form a valid date");
+    }
+    
+    public static function getCitiesList($stateId = "") {
+        if($stateId != "") {
+            $db = DB::getInstance();
+            $cities = $db->traceDown("states_cities", $stateId, 1);
+            $keys = array_keys($cities);
+            $i = 0;
+            foreach ($cities as $key => $value) {
+                $city[$i]['id'] = $key;
+                $city[$i++]['name'] = $value['value'];
+            }
+            return $city ? $city : array();
+        }
+        throw new CustomException("Argument cannot be empty");
+    }
+    
+    public static function getStatesList() {
+        $db = DB::getInstance();
+        if($db->executeQuery(array(0), "SELECT id, name FROM states_cities WHERE parent_id IS NULL AND is_deleted = ?")->count()) {
+            $state = $db->results();
+            return $state ? $state : array();
+        }
+        else {
+            return NULL;
+        }
+    }
+    
+    public static function getTeachersList($departmentId = "") {
+        $db = DB::getInstance();
+        if($departmentId != "") {
+            if($db->executeQuery(array($departmentId), "SELECT user.uid, user.name FROM user, faculty_info WHERE faculty_info.department_id = ? AND user.uid = faculty_info.uid")->count()) {
+                $teacher = $db->results();
+                return $teacher ? $teacher : array();
+            }
+            else {
+                return NULL;
+            }
+        }
+        else {
+            throw new CustomException("Argument cannot be valid");
+        }
+    }
+    
+    public static function getLabsList() {
+        $db = DB::getInstance();
+        if($db->executeQuery(array(0), "SELECT id, name FROM labs_info WHERE is_deleted = ?")->count()) {
+            $lab = $db->results();
+            return $lab ? $lab : array();
+        }
+        else { 
+            return NULL;
+        }
+    }
+
+    public static function getShortformAndLabDetails($course_class_id = ""){
+        // pending due to discussion that where group field is to be placed
+        // in class_teacher or in any other table
+    }
+    
+    /*
+     * 
+     * *****************************************************************************
+     * below functions made after the changes in department_course_subject table
+     * *****************************************************************************
+     * 
+     */
+    
+    public static function getClassesList($departmentId) {
+        // classes name and id for all department that are active for that session
+    }
+    
+    public static function getDepartmentsList() {
+        
+    }
+    
+    public static function getSubjectList($departmentId = ""){
+        if($departmentId != "") {
+            $db = DB::getInstance();
+            $array = $db->traceDown("department_course_subject", $departmentId, 2);
+            return $array;
+        }
+        throw new CustomException("Argument cannot be empty");
+    }    
 }
